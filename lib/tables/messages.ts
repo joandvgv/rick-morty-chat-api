@@ -23,7 +23,7 @@ export const createMessagesTable = (context: Construct) => {
     },
     sortKey: {
       name: "time",
-      type: AttributeType.STRING,
+      type: AttributeType.NUMBER,
     },
   });
   table.addGlobalSecondaryIndex({
