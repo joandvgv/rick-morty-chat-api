@@ -35,4 +35,25 @@ export function generateApolloCompatibleEventFromWebsocketEvent(
   return deepClonedEvent;
 }
 
+/**
+ * Generates an object that is compatible with Apollo Server V4 Lambda Handler
+ * as api gateway payload differs slightly from the one that is expected by Apollo
+ */
+export function generateApolloCompatibleEvent(
+  event: any,
+): APIGatewayProxyEventV2 {
+  const deepClonedEvent: APIGatewayProxyEventV2 = JSON.parse(
+    JSON.stringify(event),
+  );
+  deepClonedEvent.requestContext = {
+    ...deepClonedEvent.requestContext,
+    http: {
+      ...deepClonedEvent.requestContext.http,
+      method: "POST",
+    },
+  };
+
+  return deepClonedEvent;
+}
+
 export const oneHourFromNow = () => Math.round(Date.now() / 1000 + 3600);

@@ -9,6 +9,7 @@ import { Construct } from "constructs";
 import { WebSocketApi, WebSocketStage } from "@aws-cdk/aws-apigatewayv2-alpha";
 import LambdaFn from "./lambda";
 import { createConnectionsTable, GSI_NAME } from "./tables/connections";
+import { createMessagesTable } from "./tables/messages";
 
 export default class ApolloLambdaWebsocketStack extends Stack {
   private readonly webSocketApi: WebSocketApi;
@@ -24,6 +25,7 @@ export default class ApolloLambdaWebsocketStack extends Stack {
     });
 
     const connectionsTable = createConnectionsTable(this);
+    const messagesTable = createMessagesTable(this);
 
     const connectionLambda = new LambdaFn(this, "ConnectionHandler", {
       entryFilename: "websocket-connection-handler.ts",
@@ -70,12 +72,14 @@ export default class ApolloLambdaWebsocketStack extends Stack {
       envVariables: {
         BUS_NAME: eventBus.eventBusName,
         TABLE_NAME: connectionsTable.tableName,
+        MESSAGES_TABLE_NAME: messagesTable.tableName,
         REQUEST_EVENT_DETAIL_TYPE,
         API_GATEWAY_ENDPOINT: websocketStage.callbackUrl,
       },
     });
 
     connectionsTable.grantFullAccess(requestHandlerLambda.fn);
+    messagesTable.grantFullAccess(requestHandlerLambda.fn);
     eventBus.grantPutEventsTo(requestHandlerLambda.fn);
 
     requestHandlerLambda.fn.addToRolePolicy(
@@ -117,12 +121,15 @@ export default class ApolloLambdaWebsocketStack extends Stack {
       handler: "default",
       name: "EventProcessor",
       description:
-        "Dummy event processor that publishes to EventBridge to propagate messages to subscribers",
+        "Event processor that stores data and publishes to EventBridge to propagate messages to subscribers",
       envVariables: {
         BUS_NAME: eventBus.eventBusName,
+        TABLE_NAME: messagesTable.tableName,
         RESPONSE_EVENT_DETAIL_TYPE,
       },
     });
+
+    messagesTable.grantFullAccess(eventProcessorLambda.fn);
 
     new Rule(this, "ProcessRequest", {
       eventBus,

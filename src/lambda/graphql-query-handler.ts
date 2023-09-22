@@ -1,4 +1,4 @@
-import { DynamoDB, EventBridge } from "aws-sdk";
+import { DynamoDB } from "aws-sdk";
 import { FieldNode, Kind, StringValueNode, parse } from "graphql";
 import { ApolloServer } from "@apollo/server";
 import {
@@ -10,47 +10,25 @@ import { Context } from "aws-lambda";
 import typeDefs from "../graphql/schema";
 
 import {
+  generateApolloCompatibleEvent,
   generateApolloCompatibleEventFromWebsocketEvent,
   generateLambdaProxyResponse,
   oneHourFromNow,
 } from "../utils";
-import { PutEventMutationVariables } from "../types/chat";
+import putMessage from "../graphql/resolvers/putMessage";
+import getMessages from "../graphql/resolvers/getMessages";
 
 const dynamoDbClient = new DynamoDB.DocumentClient({
   apiVersion: "latest",
   region: process.env.AWS_REGION,
 });
 
-const eventBridge = new EventBridge({
-  region: process.env.AWS_REGION,
-});
-
-const REQUEST_EVENT_DETAIL_TYPE = process.env.REQUEST_EVENT_DETAIL_TYPE!;
-
 const resolvers = {
   Mutation: {
-    putEvent: async (
-      _: any,
-      { message, threadId }: PutEventMutationVariables,
-    ) =>
-      eventBridge
-        .putEvents({
-          Entries: [
-            {
-              EventBusName: process.env.BUS_NAME,
-              Source: "apollo",
-              DetailType: REQUEST_EVENT_DETAIL_TYPE,
-              Detail: JSON.stringify({
-                message,
-                threadId,
-              }),
-            },
-          ],
-        })
-        .promise(),
+    putMessage,
   },
   Query: {
-    getEvent: () => "",
+    getMessages,
   },
 };
 const server = new ApolloServer({
@@ -111,5 +89,5 @@ export default async function handleMessage(event: any) {
     );
   }
 
-  return handler(event, {} as Context, () => {});
+  return handler(generateApolloCompatibleEvent(event), {} as Context, () => {});
 }

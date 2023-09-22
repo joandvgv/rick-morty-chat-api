@@ -5,12 +5,11 @@ export default `#graphql
     ErrorCode: String
   }
 
-  type Mutation {
-    putEvent(message: String!, threadId: String!): Result
-  }
-
-  type Query {
-    getEvent: String
+  type Message {
+    character: String
+    message: String
+    threadId: String
+    time: String
   }
 
   type Result {
@@ -20,6 +19,14 @@ export default `#graphql
 
   type Subscription {
     chat(threadId: String!): String
+  }
+
+  type Mutation {
+    putMessage(message: String!, threadId: String!): Result
+  }
+
+  type Query {
+    getMessages(threadId: String!): [Message]
   }
 
   schema {
