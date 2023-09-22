@@ -7,7 +7,7 @@ import {
 } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 
-const TABLE_NAME = "ChatMessages";
+const TABLE_NAME = "ChatThreads";
 export const GSI_NAME = "MessagesCharacterMap";
 
 export const createMessagesTable = (context: Construct) => {
