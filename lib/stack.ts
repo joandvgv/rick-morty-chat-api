@@ -123,6 +123,7 @@ export default class ApolloLambdaStack extends Stack {
 
     new CodePipeline(this, "Pipeline", {
       pipelineName: "DeploymentPipeline",
+      dockerEnabledForSynth: true,
       synth: new ShellStep("Synth", {
         input: CodePipelineSource.connection(
           "joandvgv/rick-morty-chat-api",
