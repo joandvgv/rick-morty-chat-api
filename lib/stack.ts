@@ -12,7 +12,7 @@ import {
 import LambdaFn from "./lambda";
 import { createMessagesTable } from "./tables/messages";
 
-export default class ApolloLambdaWebsocketStack extends Stack {
+export default class ApolloLambdaStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
