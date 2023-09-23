@@ -4,6 +4,11 @@ import { EventBus, Rule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { HttpMethod } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
+import {
+  ShellStep,
+  CodePipelineSource,
+  CodePipeline,
+} from "aws-cdk-lib/pipelines";
 import LambdaFn from "./lambda";
 import { createMessagesTable } from "./tables/messages";
 
@@ -114,6 +119,21 @@ export default class ApolloLambdaWebsocketStack extends Stack {
     new CfnOutput(this, "RestApiEndpoint", {
       value: restApi.urlForPath("/graphql"),
       exportName: "RestApiEndpoint",
+    });
+
+    new CodePipeline(this, "Pipeline", {
+      pipelineName: "DeploymentPipeline",
+      synth: new ShellStep("Synth", {
+        input: CodePipelineSource.connection(
+          "joandvgv/rick-morty-chat-api",
+          "master",
+          {
+            connectionArn:
+              "arn:aws:codestar-connections:us-west-2:268857687287:connection/5c0d085f-29da-4394-9f07-0174598f1fcd",
+          },
+        ),
+        commands: ["npm ci", "npm run build", "npx cdk synth"],
+      }),
     });
   }
 }
