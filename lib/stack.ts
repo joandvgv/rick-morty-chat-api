@@ -132,7 +132,11 @@ export default class ApolloLambdaStack extends Stack {
               "arn:aws:codestar-connections:us-west-2:268857687287:connection/a2da8d3f-c940-4bec-a404-4b297a87e92c",
           },
         ),
-        commands: ["npm ci", "npm run build", "npx cdk synth"],
+        commands: [
+          "npm install yarn",
+          "yarn install  --frozen-lockfile",
+          "npx cdk synth",
+        ],
       }),
     });
   }
