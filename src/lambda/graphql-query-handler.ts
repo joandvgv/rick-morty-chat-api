@@ -33,6 +33,7 @@ const server = new ApolloServer({
 const corsMiddleware: middleware.MiddlewareFn<
   RequestHandler<APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2>
 > = async () => (result) => {
+  // we need to mutate the object directly to force set cors headers
   // eslint-disable-next-line no-param-reassign
   result.headers = {
     ...result.headers,
