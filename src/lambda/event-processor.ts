@@ -19,10 +19,12 @@ export default async function eventProcessor(
   const date = new Date(eventTime);
   const unixTimestamp = Math.floor(date.getTime() / 1000);
 
+  const messageData = { ...event.detail, time: unixTimestamp, id: uuidv4() };
+
   await dynamoDbClient
     .put({
       TableName: process.env.TABLE_NAME!,
-      Item: { ...event.detail, time: unixTimestamp, id: uuidv4() },
+      Item: messageData,
     })
     .promise();
 
@@ -34,10 +36,7 @@ export default async function eventProcessor(
           EventBusName: process.env.BUS_NAME,
           DetailType: process.env.RESPONSE_EVENT_DETAIL_TYPE,
           Time: new Date(),
-          Detail: JSON.stringify({
-            message: event.detail.message,
-            threadId: event.detail.threadId,
-          }),
+          Detail: JSON.stringify(messageData),
         },
       ],
     })
