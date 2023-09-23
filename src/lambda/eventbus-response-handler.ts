@@ -1,5 +1,5 @@
 import { EventBridgeEvent } from "aws-lambda";
-import * as Pusher from "pusher";
+import Pusher from "pusher";
 
 interface ResponseEventDetails {
   message: string;
