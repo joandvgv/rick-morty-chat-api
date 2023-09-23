@@ -173,6 +173,12 @@ export default class ApolloLambdaWebsocketStack extends Stack {
         stageName: "dev",
         tracingEnabled: true,
       },
+      defaultCorsPreflightOptions: {
+        allowHeaders: ["*"],
+        allowMethods: ["OPTIONS", "POST"],
+        allowCredentials: true,
+        allowOrigins: ["*"],
+      },
       restApiName: "RestApi",
     });
 
