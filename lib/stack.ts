@@ -129,7 +129,7 @@ export default class ApolloLambdaWebsocketStack extends Stack {
           "master",
           {
             connectionArn:
-              "arn:aws:codestar-connections:us-west-2:268857687287:connection/5c0d085f-29da-4394-9f07-0174598f1fcd",
+              "arn:aws:codestar-connections:us-west-2:268857687287:connection/a2da8d3f-c940-4bec-a404-4b297a87e92c",
           },
         ),
         commands: ["npm ci", "npm run build", "npx cdk synth"],
