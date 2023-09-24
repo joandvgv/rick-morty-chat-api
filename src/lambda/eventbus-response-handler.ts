@@ -1,5 +1,6 @@
 import { EventBridgeEvent } from "aws-lambda";
 import Pusher from "pusher";
+import credentials from "../environment";
 
 interface ResponseEventDetails {
   message: string;
@@ -9,11 +10,12 @@ interface ResponseEventDetails {
 export default async function handler(
   event: EventBridgeEvent<"EventResponse", ResponseEventDetails>,
 ) {
+  const environment = await credentials();
   const pusher = new Pusher({
-    appId: process.env.PUSHER_APP_ID!,
-    key: process.env.PUSHER_APP_KEY!,
-    secret: process.env.PUSHER_APP_SECRET!,
-    cluster: process.env.PUSHER_CLUSTER!,
+    appId: environment.PUSHER_APP_ID!,
+    key: environment.PUSHER_APP_KEY!,
+    secret: environment.PUSHER_APP_SECRET!,
+    cluster: environment.PUSHER_CLUSTER!,
     useTLS: true,
   });
 
