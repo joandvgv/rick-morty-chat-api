@@ -11,17 +11,27 @@ export default async function putMessage(
   _: any,
   data: PutMessageMutationVariables,
 ) {
-  await eventBridge
+  const date = new Date();
+  const unixTimestamp = Math.floor(date.getTime() / 1000);
+  const result = await eventBridge
     .putEvents({
       Entries: [
         {
           EventBusName: process.env.BUS_NAME,
           Source: "apollo",
+          Time: date,
           DetailType: REQUEST_EVENT_DETAIL_TYPE,
           Detail: JSON.stringify(data),
         },
       ],
     })
     .promise();
-  return data;
+
+  if (result.$response.error) throw new Error(result.$response.error.message);
+
+  return {
+    ...data,
+    id: result.Entries![0].EventId,
+    time: unixTimestamp.toString(),
+  };
 }
