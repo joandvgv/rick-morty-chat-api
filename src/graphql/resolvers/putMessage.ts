@@ -13,6 +13,12 @@ export default async function putMessage(
 ) {
   const date = new Date();
   const unixTimestamp = Math.floor(date.getTime() / 1000);
+
+  const eventDetail = {
+    ...data,
+    time: unixTimestamp,
+  };
+
   const result = await eventBridge
     .putEvents({
       Entries: [
@@ -21,7 +27,7 @@ export default async function putMessage(
           Source: "apollo",
           Time: date,
           DetailType: REQUEST_EVENT_DETAIL_TYPE,
-          Detail: JSON.stringify(data),
+          Detail: JSON.stringify(eventDetail),
         },
       ],
     })

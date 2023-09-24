@@ -17,7 +17,7 @@ export default async function eventProcessor(
   await dynamoDbClient
     .put({
       TableName: process.env.TABLE_NAME!,
-      Item: event.detail,
+      Item: { ...event.detail, id: event.id },
     })
     .promise();
 
