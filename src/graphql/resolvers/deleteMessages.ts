@@ -1,10 +1,14 @@
-import { DynamoDB } from "aws-sdk";
+import { DynamoDB, EventBridge } from "aws-sdk";
 import chunk from "lodash/chunk";
 import { DeleteMessagesMutationVariables } from "../../types/chat";
 import getMessages from "./getMessages";
 
 const dynamoDbClient = new DynamoDB.DocumentClient({
   apiVersion: "latest",
+  region: process.env.AWS_REGION,
+});
+
+const eventBridge = new EventBridge({
   region: process.env.AWS_REGION,
 });
 
@@ -36,6 +40,22 @@ export default async function deleteMessages(
   );
 
   await Promise.all(promises);
+
+  await eventBridge
+    .putEvents({
+      Entries: [
+        {
+          Source: "event.processor",
+          EventBusName: process.env.BUS_NAME,
+          DetailType: process.env.DELETE_EVENT_DETAIL_TYPE,
+          Time: new Date(),
+          Detail: JSON.stringify({
+            threadId: data.threadId,
+          }),
+        },
+      ],
+    })
+    .promise();
 
   return { ids: messages.map((item) => item.id) };
 }

@@ -20,6 +20,7 @@ export default class ApolloLambdaStack extends Stack {
 
     const REQUEST_EVENT_DETAIL_TYPE = "ClientMessageReceived";
     const RESPONSE_EVENT_DETAIL_TYPE = "ClientMessageProcessed";
+    const DELETE_EVENT_DETAIL_TYPE = "ClientBulkDelete";
 
     const eventBus = new EventBus(this, "ApolloMutationEvents", {
       eventBusName: "ApolloMutationEvents",
@@ -52,6 +53,8 @@ export default class ApolloLambdaStack extends Stack {
           "Handles GraphQL responses from EventBridge and sends it to subscribers",
         envVariables: {
           BUS_NAME: eventBus.eventBusName,
+          RESPONSE_EVENT_DETAIL_TYPE,
+          DELETE_EVENT_DETAIL_TYPE,
         },
       },
     );
@@ -94,7 +97,7 @@ export default class ApolloLambdaStack extends Stack {
       enabled: true,
       ruleName: "RespondToChat",
       eventPattern: {
-        detailType: [RESPONSE_EVENT_DETAIL_TYPE],
+        detailType: [RESPONSE_EVENT_DETAIL_TYPE, DELETE_EVENT_DETAIL_TYPE],
       },
       targets: [new LambdaFunction(eventBridgeToSubscriptionsLambda.fn)],
     });
