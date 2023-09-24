@@ -1,4 +1,5 @@
 import { Stack, StackProps, CfnOutput } from "aws-cdk-lib";
+import * as iam from "aws-cdk-lib/aws-iam";
 import { RestApi, LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
 import { EventBus, Rule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
@@ -10,6 +11,7 @@ import {
   CodePipeline,
 } from "aws-cdk-lib/pipelines";
 import LambdaFn from "./lambda";
+
 import { createMessagesTable } from "./tables/messages";
 
 export default class ApolloLambdaStack extends Stack {
@@ -52,6 +54,14 @@ export default class ApolloLambdaStack extends Stack {
           BUS_NAME: eventBus.eventBusName,
         },
       },
+    );
+
+    eventBridgeToSubscriptionsLambda.fn.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["ssm:GetParameter", "ssm:SendCommand"],
+        resources: ["*"],
+      }),
     );
 
     const eventProcessorLambda = new LambdaFn(this, "EventProcessorLambda", {
