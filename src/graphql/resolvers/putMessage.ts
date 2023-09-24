@@ -11,7 +11,7 @@ export default async function putMessage(
   _: any,
   data: PutMessageMutationVariables,
 ) {
-  return eventBridge
+  await eventBridge
     .putEvents({
       Entries: [
         {
@@ -23,4 +23,5 @@ export default async function putMessage(
       ],
     })
     .promise();
+  return data;
 }

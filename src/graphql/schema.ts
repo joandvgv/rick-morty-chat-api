@@ -6,6 +6,7 @@ export default `#graphql
   }
 
   type Message {
+    id: String
     character: String
     message: String
     threadId: String
@@ -22,7 +23,7 @@ export default `#graphql
   }
 
   type Mutation {
-    putMessage(message: String!, threadId: String!, character: String!): Result
+    putMessage(message: String!, threadId: String!, character: String!): Message
   }
 
   type Query {
