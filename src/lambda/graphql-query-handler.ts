@@ -16,10 +16,12 @@ import typeDefs from "../graphql/schema";
 import { generateApolloCompatibleEvent } from "../utils";
 import putMessage from "../graphql/resolvers/putMessage";
 import getMessages from "../graphql/resolvers/getMessages";
+import deleteMessages from "../graphql/resolvers/deleteMessages";
 
 const resolvers = {
   Mutation: {
     putMessage,
+    deleteMessages,
   },
   Query: {
     getMessages,

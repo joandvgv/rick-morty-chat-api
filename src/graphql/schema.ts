@@ -13,9 +13,8 @@ export default `#graphql
     time: String
   }
 
-  type Result {
-    Entries: [EventDetails]
-    FailedEntries: Int
+  type DeleteResult {
+    ids: [String]
   }
 
   type Subscription {
@@ -24,6 +23,7 @@ export default `#graphql
 
   type Mutation {
     putMessage(message: String!, threadId: String!, character: String!): Message
+    deleteMessages(threadId: String!): DeleteResult
   }
 
   type Query {

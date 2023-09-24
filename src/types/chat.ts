@@ -7,3 +7,7 @@ export type PutMessageMutationVariables = {
 export type GetMessagesQueryVariables = {
   threadId: string;
 };
+
+export type DeleteMessagesMutationVariables = {
+  threadId: string;
+};
