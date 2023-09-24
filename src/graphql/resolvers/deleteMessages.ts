@@ -45,7 +45,7 @@ export default async function deleteMessages(
     .putEvents({
       Entries: [
         {
-          Source: "event.processor",
+          Source: "graphql.handler",
           EventBusName: process.env.BUS_NAME,
           DetailType: process.env.DELETE_EVENT_DETAIL_TYPE,
           Time: new Date(),

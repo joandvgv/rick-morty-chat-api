@@ -37,6 +37,7 @@ export default class ApolloLambdaStack extends Stack {
         BUS_NAME: eventBus.eventBusName,
         MESSAGES_TABLE_NAME: messagesTable.tableName,
         REQUEST_EVENT_DETAIL_TYPE,
+        DELETE_EVENT_DETAIL_TYPE,
       },
     });
     messagesTable.grantFullAccess(requestHandlerLambda.fn);
