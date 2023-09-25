@@ -38,10 +38,12 @@ export default class Database {
   }
 
   async bulkDelete<T extends DynamoDB.DocumentClient.WriteRequests>(items: T) {
-    return this.dynamoDbClient.batchWrite({
-      RequestItems: {
-        [this.tableName]: items,
-      },
-    });
+    return this.dynamoDbClient
+      .batchWrite({
+        RequestItems: {
+          [this.tableName]: items,
+        },
+      })
+      .promise();
   }
 }
