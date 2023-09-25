@@ -8,7 +8,7 @@ const eventBridge = new EventBridge({
 });
 
 export default async function putMessage(
-  _: any,
+  _: unknown,
   data: PutMessageMutationVariables,
 ) {
   const date = new Date();

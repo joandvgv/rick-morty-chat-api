@@ -12,5 +12,5 @@ export default async function getCreds() {
     WithDecryption: true,
   });
   const res = await client.send(command);
-  return JSON.parse(res.Parameter?.Value!);
+  return JSON.parse(res.Parameter?.Value ?? "{}");
 }

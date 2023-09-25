@@ -6,7 +6,7 @@ const eventBridge = new EventBridge({
 });
 
 export default async function deleteMessages(
-  _: any,
+  _: unknown,
   data: DeleteMessagesMutationVariables,
 ) {
   await eventBridge

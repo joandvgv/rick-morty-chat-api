@@ -6,6 +6,7 @@ import {
 } from "@as-integrations/aws-lambda";
 
 import {
+  APIGatewayProxyEvent,
   APIGatewayProxyEventV2,
   APIGatewayProxyStructuredResultV2,
   Context,
@@ -53,6 +54,6 @@ const handler = startServerAndCreateLambdaHandler(
   },
 );
 
-export default async function handleMessage(event: any) {
+export default async function handleMessage(event: APIGatewayProxyEvent) {
   return handler(generateApolloCompatibleEvent(event), {} as Context, () => {});
 }

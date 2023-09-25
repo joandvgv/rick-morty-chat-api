@@ -7,7 +7,7 @@ const dynamoDbClient = new DynamoDB.DocumentClient({
 });
 
 export default async function getMessages(
-  _: any,
+  _: unknown,
   data: GetMessagesQueryVariables,
 ) {
   const result = await dynamoDbClient

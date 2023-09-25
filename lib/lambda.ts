@@ -13,7 +13,7 @@ export type Props = {
   entryFilename: string;
   handler?: string;
   timeout?: Duration;
-  envVariables?: any;
+  envVariables?: Record<string, string>;
 };
 
 export default class LambdaFn extends Construct {

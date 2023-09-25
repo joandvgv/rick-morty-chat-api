@@ -50,6 +50,7 @@
     "aws-sdk": "^2.1462.0",
     "constructs": "^10.0.0",
     "dotenv": "^16.3.1",
+    "eslint-config-prettier": "^9.0.0",
     "graphql": "^16.8.1",
     "lodash": "^4.17.21",
     "pusher": "^5.1.3",
