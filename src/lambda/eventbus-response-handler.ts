@@ -10,11 +10,6 @@ type EventResponse = PutMessageMutationVariables & {
 export default async function handler(
   event: EventBridgeEvent<"EventResponse", EventResponse>,
 ) {
-  const eventDetailTypeMap = {
-    [process.env.RESPONSE_EVENT_DETAIL_TYPE!]: "message",
-    [process.env.DELETE_EVENT_DETAIL_TYPE!]: "bulkDelete",
-  } as const;
-
   const environment = await credentials();
   const pusher = new Pusher({
     appId: environment.PUSHER_APP_ID!,
@@ -24,11 +19,7 @@ export default async function handler(
     useTLS: true,
   });
 
-  await pusher.trigger(
-    event.detail.threadId,
-    eventDetailTypeMap[event["detail-type"]],
-    event.detail,
-  );
+  await pusher.trigger(event.detail.threadId, event.detail.type, event.detail);
 
   return true;
 }

@@ -50,7 +50,7 @@ export const saveMessage = async (
 ) =>
   dynamoDbClient
     .put({
-      TableName: process.env.TABLE_NAME!,
+      TableName: process.env.MESSAGES_TABLE_NAME!,
       Item: { ...event.detail, id: event.id },
     })
     .promise();
@@ -59,11 +59,19 @@ export default async function eventProcessor(
   event: EventBridgeEvent<"EventResponse", PutMessageMutationVariables>,
 ) {
   const eventActionMap = {
-    [process.env.REQUEST_EVENT_DETAIL_TYPE!]: saveMessage,
-    [process.env.DELETE_EVENT_DETAIL_TYPE!]: deleteMessages,
+    [process.env.REQUEST_EVENT_DETAIL_TYPE!]: {
+      fn: saveMessage,
+      name: "message",
+    },
+    [process.env.DELETE_EVENT_DETAIL_TYPE!]: {
+      fn: deleteMessages,
+      name: "bulkDelete",
+    },
   } as const;
 
-  await eventActionMap[event["detail-type"]](event);
+  const detailType = event["detail-type"];
+  const action = eventActionMap[detailType];
+  await action.fn(event);
 
   return eventBridge
     .putEvents({
@@ -71,9 +79,9 @@ export default async function eventProcessor(
         {
           Source: "event.processor",
           EventBusName: process.env.BUS_NAME,
-          DetailType: event["detail-type"],
+          DetailType: process.env.RESPONSE_EVENT_DETAIL_TYPE,
           Time: new Date(),
-          Detail: JSON.stringify(event.detail),
+          Detail: JSON.stringify({ ...event.detail, type: action.name }),
         },
       ],
     })
