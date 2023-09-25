@@ -1,11 +1,7 @@
-import { EventBridge } from "aws-sdk";
 import { PutMessageMutationVariables } from "../../types/chat";
+import EventHandler from "../../lib/aws/event-bridge";
 
 const REQUEST_EVENT_DETAIL_TYPE = process.env.REQUEST_EVENT_DETAIL_TYPE!;
-
-const eventBridge = new EventBridge({
-  region: process.env.AWS_REGION,
-});
 
 export default async function putMessage(
   _: unknown,
@@ -19,25 +15,19 @@ export default async function putMessage(
     time: unixTimestamp,
   };
 
-  const result = await eventBridge
-    .putEvents({
-      Entries: [
-        {
-          EventBusName: process.env.BUS_NAME,
-          Source: "apollo",
-          Time: date,
-          DetailType: REQUEST_EVENT_DETAIL_TYPE,
-          Detail: JSON.stringify(eventDetail),
-        },
-      ],
-    })
-    .promise();
+  const eventHandler = new EventHandler(process.env.BUS_NAME!);
 
-  if (result.$response.error) throw new Error(result.$response.error.message);
+  const result = await eventHandler.emit(
+    "apollo",
+    REQUEST_EVENT_DETAIL_TYPE,
+    eventDetail,
+  );
+
+  if (result.error) throw new Error(result.error.message);
 
   return {
     ...data,
-    id: result.Entries![0].EventId,
+    id: result.id,
     time: unixTimestamp.toString(),
   };
 }

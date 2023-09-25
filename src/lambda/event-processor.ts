@@ -1,25 +1,16 @@
 import { EventBridgeEvent } from "aws-lambda";
-import { DynamoDB, EventBridge } from "aws-sdk";
 import chunk from "lodash/chunk";
 import {
   DeleteMessagesMutationVariables,
   PutMessageMutationVariables,
-} from "../types/chat";
-import getMessages from "../graphql/resolvers/getMessages";
-
-const eventBridge = new EventBridge({
-  region: process.env.AWS_REGION,
-});
-
-const dynamoDbClient = new DynamoDB.DocumentClient({
-  apiVersion: "latest",
-  region: process.env.AWS_REGION,
-});
+import Database from "../lib/aws/dynamo";
+import EventHandler from "../lib/aws/event-bridge";
 
 export const deleteMessages = async (
   event: EventBridgeEvent<"EventResponse", DeleteMessagesMutationVariables>,
 ) => {
   const messages = (await getMessages(null, event.detail)) ?? [];
+  const database = new Database(process.env.MESSAGES_TABLE_NAME!);
 
   const deleteRequests = messages.map((item) => ({
     DeleteRequest: {
@@ -33,13 +24,7 @@ export const deleteMessages = async (
   const chunks = chunk(deleteRequests, 25);
 
   const promises = chunks.map((requestItems) =>
-    dynamoDbClient
-      .batchWrite({
-        RequestItems: {
-          [process.env.MESSAGES_TABLE_NAME!]: requestItems,
-        },
-      })
-      .promise(),
+    database.bulkDelete(requestItems),
   );
 
   await Promise.all(promises);
@@ -47,17 +32,16 @@ export const deleteMessages = async (
 
 export const saveMessage = async (
   event: EventBridgeEvent<"EventResponse", PutMessageMutationVariables>,
-) =>
-  dynamoDbClient
-    .put({
-      TableName: process.env.MESSAGES_TABLE_NAME!,
-      Item: { ...event.detail, id: event.id },
-    })
-    .promise();
+) => {
+  const database = new Database(process.env.MESSAGES_TABLE_NAME!);
+  return database.save({ ...event.detail, id: event.id });
+};
 
 export default async function eventProcessor(
   event: EventBridgeEvent<"EventResponse", PutMessageMutationVariables>,
 ) {
+  const eventHandler = new EventHandler(process.env.BUS_NAME!);
+
   const eventActionMap = {
     [process.env.REQUEST_EVENT_DETAIL_TYPE!]: {
       fn: saveMessage,
@@ -73,17 +57,9 @@ export default async function eventProcessor(
   const action = eventActionMap[detailType];
   await action.fn(event);
 
-  return eventBridge
-    .putEvents({
-      Entries: [
-        {
-          Source: "event.processor",
-          EventBusName: process.env.BUS_NAME,
-          DetailType: process.env.RESPONSE_EVENT_DETAIL_TYPE,
-          Time: new Date(),
-          Detail: JSON.stringify({ ...event.detail, type: action.name }),
-        },
-      ],
-    })
-    .promise();
+  return eventHandler.emit(
+    "event.processor",
+    process.env.RESPONSE_EVENT_DETAIL_TYPE!,
+    { ...event.detail, type: action.name },
+  );
 }

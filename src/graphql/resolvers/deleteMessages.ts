@@ -1,29 +1,19 @@
-import { EventBridge } from "aws-sdk";
 import { DeleteMessagesMutationVariables } from "../../types/chat";
-
-const eventBridge = new EventBridge({
-  region: process.env.AWS_REGION,
-});
+import EventHandler from "../../lib/aws/event-bridge";
 
 export default async function deleteMessages(
   _: unknown,
   data: DeleteMessagesMutationVariables,
 ) {
-  await eventBridge
-    .putEvents({
-      Entries: [
-        {
-          Source: "graphql.handler",
-          EventBusName: process.env.BUS_NAME,
-          DetailType: process.env.DELETE_EVENT_DETAIL_TYPE,
-          Time: new Date(),
-          Detail: JSON.stringify({
-            threadId: data.threadId,
-          }),
-        },
-      ],
-    })
-    .promise();
+  const eventHandler = new EventHandler(process.env.BUS_NAME!);
+
+  await eventHandler.emit(
+    "graphql.handler",
+    process.env.DELETE_EVENT_DETAIL_TYPE!,
+    {
+      threadId: data.threadId,
+    },
+  );
 
   return { success: true };
 }
