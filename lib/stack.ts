@@ -73,11 +73,12 @@ export default class ApolloLambdaStack extends Stack {
       handler: "default",
       name: "EventProcessor",
       description:
-        "Event processor that stores data and publishes to EventBridge to propagate messages to subscribers",
+        "Event processor that stores data and publishes back to EventBridge to propagate messages to subscribers",
       envVariables: {
         BUS_NAME: eventBus.eventBusName,
-        TABLE_NAME: messagesTable.tableName,
+        MESSAGES_TABLE_NAME: messagesTable.tableName,
         RESPONSE_EVENT_DETAIL_TYPE,
+        DELETE_EVENT_DETAIL_TYPE,
       },
     });
 
@@ -88,7 +89,7 @@ export default class ApolloLambdaStack extends Stack {
       enabled: true,
       ruleName: "ProcessRequest",
       eventPattern: {
-        detailType: [REQUEST_EVENT_DETAIL_TYPE],
+        detailType: [REQUEST_EVENT_DETAIL_TYPE, DELETE_EVENT_DETAIL_TYPE],
       },
       targets: [new LambdaFunction(eventProcessorLambda.fn)],
     });
@@ -98,7 +99,7 @@ export default class ApolloLambdaStack extends Stack {
       enabled: true,
       ruleName: "RespondToChat",
       eventPattern: {
-        detailType: [RESPONSE_EVENT_DETAIL_TYPE, DELETE_EVENT_DETAIL_TYPE],
+        detailType: [RESPONSE_EVENT_DETAIL_TYPE],
       },
       targets: [new LambdaFunction(eventBridgeToSubscriptionsLambda.fn)],
     });

@@ -14,7 +14,7 @@ export default `#graphql
   }
 
   type DeleteResult {
-    ids: [String]
+    success: Boolean
   }
 
   type Subscription {
