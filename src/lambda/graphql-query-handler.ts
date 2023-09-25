@@ -12,12 +12,12 @@ import {
   Context,
 } from "aws-lambda";
 import { RequestHandler } from "@as-integrations/aws-lambda/dist/request-handlers/_index";
-import typeDefs from "../graphql/schema";
+import typeDefs from "graphql/schema";
 
-import { generateApolloCompatibleEvent } from "../utils";
-import putMessage from "../graphql/resolvers/putMessage";
-import getMessages from "../graphql/resolvers/getMessages";
-import deleteMessages from "../graphql/resolvers/deleteMessages";
+import { generateApolloCompatibleEvent } from "utils";
+import putMessage from "graphql/resolvers/putMessage";
+import getMessages from "graphql/resolvers/getMessages";
+import deleteMessages from "graphql/resolvers/deleteMessages";
 
 const resolvers = {
   Mutation: {

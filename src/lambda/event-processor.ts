@@ -3,8 +3,10 @@ import chunk from "lodash/chunk";
 import {
   DeleteMessagesMutationVariables,
   PutMessageMutationVariables,
-import Database from "../lib/aws/dynamo";
-import EventHandler from "../lib/aws/event-bridge";
+} from "types/chat";
+import getMessages from "graphql/resolvers/getMessages";
+import Database from "lib/aws/dynamo";
+import EventHandler from "lib/aws/event-bridge";
 
 export const deleteMessages = async (
   event: EventBridgeEvent<"EventResponse", DeleteMessagesMutationVariables>,

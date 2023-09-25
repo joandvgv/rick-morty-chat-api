@@ -1,7 +1,7 @@
 import { EventBridgeEvent } from "aws-lambda";
 import Pusher from "pusher";
-import credentials from "../environment";
-import { PutMessageMutationVariables } from "../types/chat";
+import credentials from "environment";
+import { PutMessageMutationVariables } from "types/chat";
 
 type EventResponse = PutMessageMutationVariables & {
   type: "message" | "bulkDelete";
