@@ -1,10 +1,4 @@
 export default `#graphql
-  type EventDetails {
-    EventId: String
-    ErrorMessage: String
-    ErrorCode: String
-  }
-
   type Message {
     id: String
     character: String
@@ -15,10 +9,6 @@ export default `#graphql
 
   type DeleteResult {
     success: Boolean
-  }
-
-  type Subscription {
-    chat(threadId: String!): String
   }
 
   type Mutation {
@@ -33,6 +23,5 @@ export default `#graphql
   schema {
     query: Query
     mutation: Mutation
-    subscription: Subscription
   }
 `;
